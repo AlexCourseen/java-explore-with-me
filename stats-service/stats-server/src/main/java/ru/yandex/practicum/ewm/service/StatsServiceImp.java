@@ -27,14 +27,19 @@ public class StatsServiceImp implements StatsService {
         List<ViewStatsDto> stats;
         LocalDateTime startTime = LocalDateTime.parse(start, formatter);
         LocalDateTime endTime = LocalDateTime.parse(end, formatter);
+
+        if (startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("Дата начала не может быть позже даты окончания");
+        }
+
         if (unique) {
-            if (!uris.isEmpty()) {
+            if (uris != null && !uris.isEmpty()) {
                 stats = statsRepository.findAllStatsByUriWithUniqueIp(startTime, endTime, uris);
             } else {
                 stats = statsRepository.findStatsWithUniqueIp(startTime, endTime);
             }
         } else {
-            if (!uris.isEmpty()) {
+            if (uris != null && !uris.isEmpty()) {
                 stats = statsRepository.findAllStatsByUri(startTime, endTime, uris);
             } else {
                 stats = statsRepository.findAllStats(startTime, endTime);
