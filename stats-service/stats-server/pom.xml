@@ -54,4 +54,23 @@
         </dependency>
 
     </dependencies>
+    <build>
+        <plugins>
+            <!-- Плагин Spring Boot для сборки ТОЛСТОГО исполняемого JAR -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- ДОБАВЬТЕ ЭТОТ БЛОК EXECUTIONS СТРОГО СЮДА -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <!-- КОНЕЦ ДОБАВЛЕННОГО БЛОКА -->
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
