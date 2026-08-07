@@ -1,6 +1,5 @@
 services:
   stats-server:
-<<<<<<< HEAD
     build: stats-service/stats-server
     container_name: stats-server
     ports:
@@ -40,17 +39,3 @@ services:
 
 volumes:
   stats_postgres_data:
-=======
-    ports:
-      - "9090:9090"
-
-  stats-db:
-    image: postgres:16.1
-
-  ewm-service:
-    ports:
-      - "8080:8080"
-
-  ewm-db:
-    image: postgres:16.1
->>>>>>> origin/main
