@@ -30,11 +30,10 @@ public class PublicEventController {
                                               @RequestParam(defaultValue = "10") @PositiveOrZero int size,
                                               @RequestParam(required = false) String sort,
                                               @RequestParam(required = false) String text,
-                                              @RequestParam(required = false) List<Long> ids,
-                                              @RequestParam(required = false) List<Long> catIds,
+                                              @RequestParam(required = false) List<Long> categories,
                                               @RequestParam(required = false) Boolean paid,
-                                              @RequestParam(required = false) String startDateTime,
-                                              @RequestParam(required = false) String endDateTime,
+                                              @RequestParam(required = false) String rangeStart,
+                                              @RequestParam(required = false) String rangeEnd,
                                               @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                               HttpServletRequest request) {
         EndpointHitDto hitStats = new EndpointHitDto();
@@ -43,7 +42,7 @@ public class PublicEventController {
         hitStats.setUri(request.getRequestURI());
         hitStats.setTimestamp(LocalDateTime.now().toString());
         statsClient.createHit(hitStats);
-        return eventService.getPublishedEvents(from, size, sort, text, ids, catIds, paid, startDateTime, endDateTime,
+        return eventService.getPublishedEvents(from, size, sort, text, categories, paid, rangeStart, rangeEnd,
                 onlyAvailable);
     }
 
