@@ -41,9 +41,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Collection<EventFullDto> getPublishedEvents(int from, int size, String sort, String text, List<Long> ids,
-                                                       List<Long> catIds, Boolean paid, String start,
-                                                       String end, Boolean onlyAvailable) {
+    public Collection<EventFullDto> getPublishedEvents(int from, int size, String sort, String text, List<Long> catIds,
+                                                       Boolean paid, String start, String end, Boolean onlyAvailable) {
         String search = (text != null && !text.isBlank()) ? text.toLowerCase() : null;
         LocalDateTime now = null;
         LocalDateTime startTime = null;
@@ -67,13 +66,13 @@ public class EventServiceImpl implements EventService {
         }
         if (onlyAvailable) {
             return eventRepository.findEventsWithParamsOnlyAvailable(
-                            (PageRequest.of(from, size, sortBy)), search, ids, catIds, paid,
+                            (PageRequest.of(from, size, sortBy)), search, catIds, paid,
                             startTime, endTime, now).stream()
                     .map(EventMapper::mapToEventFullDto)
                     .collect(Collectors.toList());
         } else {
             return eventRepository.findEventsWithParams(
-                            (PageRequest.of(from, size, sortBy)), search, ids, catIds, paid,
+                            (PageRequest.of(from, size, sortBy)), search, catIds, paid,
                             endTime, endTime, now).stream()
                     .map(EventMapper::mapToEventFullDto)
                     .collect(Collectors.toList());

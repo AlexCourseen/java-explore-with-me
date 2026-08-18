@@ -15,7 +15,6 @@ public interface EventService {
                                                 int size,
                                                 String sortBy,
                                                 String text,
-                                                List<Long> ids,
                                                 List<Long> catIds,
                                                 Boolean paid,
                                                 String startDateTime,

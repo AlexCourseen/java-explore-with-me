@@ -16,7 +16,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (CAST(:text AS string) IS NULL OR " +
             "LOWER(e.annotation) LIKE CONCAT('%', CAST(:text AS string), '%') OR " +
             "LOWER(e.description) LIKE CONCAT('%', CAST(:text AS string), '%')) " +
-            "AND (:ids IS NULL OR e.id IN :ids)" +
             "AND (:catIds IS NULL OR e.category.id IN :catIds) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (CAST(:now AS timestamp) IS NULL OR e.eventDate > :now) " +
@@ -25,7 +24,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND e.participantLimit = 0 OR e.confirmedRequests < e.participantLimit ")
     List<Event> findEventsWithParamsOnlyAvailable(Pageable pageable,
                                                   @Param("text") String text,
-                                                  @Param("ids") List<Long> ids,
                                                   @Param("catIds") List<Long> catIds,
                                                   @Param("paid") Boolean paid,
                                                   @Param("start") LocalDateTime start,
@@ -37,7 +35,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (CAST(:text AS string) IS NULL OR " +
             "LOWER(e.annotation) LIKE CONCAT('%', CAST(:text AS string), '%') OR " +
             "LOWER(e.description) LIKE CONCAT('%', CAST(:text AS string), '%')) " +
-            "AND (:ids IS NULL OR e.id IN :ids)" +
             "AND (:catIds IS NULL OR e.category.id IN :catIds) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (CAST(:now AS timestamp) IS NULL OR e.eventDate > :now) " +
@@ -45,7 +42,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (CAST(:end AS timestamp) IS NULL OR e.eventDate <= :end)")
     List<Event> findEventsWithParams(Pageable pageable,
                                      @Param("text") String text,
-                                     @Param("ids") List<Long> ids,
                                      @Param("catIds") List<Long> catIds,
                                      @Param("paid") Boolean paid,
                                      @Param("start") LocalDateTime start,
