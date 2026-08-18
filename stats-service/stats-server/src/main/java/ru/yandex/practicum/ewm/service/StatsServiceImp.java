@@ -19,7 +19,7 @@ public class StatsServiceImp implements StatsService {
 
     @Override
     public void createHit(EndpointHitDto request) {
-        statsRepository.save(HitMapper.mapToHit(request, formatter));
+        statsRepository.save(HitMapper.mapToHit(request));
     }
 
     @Override

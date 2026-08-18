@@ -6,15 +6,14 @@ import ru.yandex.practicum.ewm.dto.EndpointHitDto;
 import ru.yandex.practicum.ewm.model.Hit;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HitMapper {
-    public static Hit mapToHit(EndpointHitDto request, DateTimeFormatter formatter) {
+    public static Hit mapToHit(EndpointHitDto request) {
         Hit hit = new Hit();
         hit.setIp(request.getIp());
         hit.setUri(request.getUri());
-        hit.setCreated(LocalDateTime.parse(request.getTimestamp(),formatter));
+        hit.setCreated(LocalDateTime.parse(request.getTimestamp()));
         hit.setApp(request.getApp());
         return hit;
     }
