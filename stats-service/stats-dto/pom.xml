@@ -15,7 +15,6 @@
     <name>Stats Service DTO</name>
 
     <dependencies>
-        <!-- Валидация для полей DTO (например, @NotBlank, @NotNull) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
