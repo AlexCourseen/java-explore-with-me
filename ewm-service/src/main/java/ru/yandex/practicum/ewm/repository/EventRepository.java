@@ -61,4 +61,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                   @Param("categories") List<Long> categories,
                                   @Param("rangeStart") LocalDateTime rangeStart,
                                   @Param("rangeEnd") LocalDateTime rangeEnd);
+
+    List<Event> findByInitiatorId(Pageable pageable, long userId);
+
 }

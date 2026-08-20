@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import static ru.yandex.practicum.ewm.model.State.CANCELED;
 import static ru.yandex.practicum.ewm.model.State.PENDING;
 import static ru.yandex.practicum.ewm.model.State.PUBLISHED;
+import static ru.yandex.practicum.ewm.model.StateAction.CANCEL_REVIEW;
 import static ru.yandex.practicum.ewm.model.StateAction.REJECT_EVENT;
 
 @Service
@@ -49,8 +50,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto getEvent(long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() ->
-                new NotFoundException("Событие с " + eventId + " не найдено"));
+        Event event = checkEvent(eventId);
         event.setViews(event.getViews() + 1);
         eventRepository.save(event);
         return EventMapper.mapToEventFullDto(event);
@@ -126,8 +126,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto createEvent(long userId, NewEventDto request) {
-        User initiator = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("user с " + userId + " не найден"));
+        User initiator = checkUser(userId);
         Category category = categoryRepository.findById(request.getCategory()).orElseThrow(() ->
                 new NotFoundException("Категория c id=" + request.getCategory() + " не найдена"));
         LocalDateTime eventDate = LocalDateTime.parse(request.getEventDate(), formatter);
@@ -147,8 +146,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEventByAdmin(long eventId, UpdateEventAdminRequest request) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() ->
-                new NotFoundException("Событие с " + eventId + " не найдено"));
+        Event event = checkEvent(eventId);
         updateEventFields(event, request);
         if (request.hasStateAction()) {
             StateAction stateAction = request.getStateAction();
@@ -170,10 +168,8 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEventByUser(long eventId, long userId, UpdateEventUserRequest request) {
-        userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("user с " + userId + " не найден"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() ->
-                new NotFoundException("Событие с " + eventId + " не найдено"));
+        checkUser(userId);
+        Event event = checkEvent(eventId);
         updateEventFields(event, request);
         if (request.hasStateAction()) {
             StateAction stateAction = request.getStateAction();
@@ -182,13 +178,29 @@ public class EventServiceImpl implements EventService {
                 //TODO Сделать код ошибки 409
                 throw new ValidationException("Невозможно изменить событие в статусе PUBLISHED");
             }
-            if (stateAction.equals(StateAction.PUBLISH_EVENT)) {
-                event.setState(PUBLISHED);
+            if (stateAction.equals(StateAction.SEND_TO_REVIEW)) {
+                event.setState(PENDING);
             }
-            if (stateAction.equals(REJECT_EVENT)) {
+            if (stateAction.equals(CANCEL_REVIEW)) {
                 event.setState(CANCELED);
             }
         }
+        return EventMapper.mapToEventFullDto(event);
+    }
+
+    @Override
+    public Collection<EventShortDto> getUsersEvents(int from, int size, long userId) {
+        checkUser(userId);
+        return eventRepository.findByInitiatorId(PageRequest.of(from, size), userId)
+                .stream()
+                .map(EventMapper::mapToEventShortDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EventFullDto getUsersEvent(long userId, long eventId) {
+        checkUser(userId);
+        Event event = checkEvent(eventId);
         return EventMapper.mapToEventFullDto(event);
     }
 
@@ -215,6 +227,16 @@ public class EventServiceImpl implements EventService {
             //TODO Сделать код ошибки 409
             throw new DuplicatedDataException("должно содержать дату, которая еще не наступила");
         }
+    }
+
+    private User checkUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("user с " + userId + " не найден"));
+    }
+
+    private Event checkEvent(long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() ->
+                new NotFoundException("Событие с " + eventId + " не найдено"));
     }
 
     private Location checkLocation(Location location) {
