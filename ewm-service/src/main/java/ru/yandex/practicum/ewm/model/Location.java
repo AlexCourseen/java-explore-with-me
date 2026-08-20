@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @Entity
@@ -27,4 +29,15 @@ public class Location {
     @NotNull(message = "Долгота не может быть пустой")
     private float lon;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Location location = (Location) o;
+        return Float.compare(lat, location.lat) == 0 && Float.compare(lon, location.lon) == 0 && Objects.equals(id, location.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, lat, lon);
+    }
 }
