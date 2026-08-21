@@ -53,10 +53,6 @@ public class Event {
     @NotNull(message = "Категория события не может быть пустым")
     private Category category;
 
-    @JoinColumn(name = "compilation_id")
-    @ManyToOne
-    private Compilation complitation;
-
     @JoinColumn(name = "initiator_id")
     @ManyToOne
     private User initiator;

@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS events (
     description varchar(7000) NOT NULL,
     event_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     initiator_id BIGINT NOT NULL,
-    compilation_id BIGINT,
     location_id BIGINT NOT NULL,
     paid boolean NOT NULL,
     participant_limit INTEGER DEFAULT 0,
@@ -51,6 +50,14 @@ CREATE TABLE IF NOT EXISTS events (
     CONSTRAINT pk_event PRIMARY KEY (id),
     FOREIGN KEY (initiator_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (compilation_id) REFERENCES compilations(id)
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    );
+
+DROP TABLE IF EXISTS compilation_events CASCADE;
+CREATE TABLE IF NOT EXISTS compilation_events (
+    event_id BIGINT NOT NULL,
+    compilation_id BIGINT NOT NULL,
+    CONSTRAINT pk_compilation_events PRIMARY KEY (event_id,compilation_id),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (compilation_id) REFERENCES compilations(id) ON DELETE CASCADE
 );

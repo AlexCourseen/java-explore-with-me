@@ -7,6 +7,8 @@ import ru.yandex.practicum.ewm.dto.compilation.NewCompilationDto;
 import ru.yandex.practicum.ewm.dto.compilation.UpdateCompilationRequest;
 import ru.yandex.practicum.ewm.model.Compilation;
 
+import java.util.List;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CompilationMapper {
     public static Compilation mapNewCompilationDtoToCompilation(NewCompilationDto dto) {
@@ -21,6 +23,14 @@ public final class CompilationMapper {
         dto.setTitle(compilation.getTitle());
         dto.setPinned(compilation.getPinned());
         dto.setId(compilation.getId());
+
+        if (compilation.getEvents() != null) {
+            dto.setEvents(compilation.getEvents().stream()
+                    .map(EventMapper::mapToEventShortDto)
+                    .toList());
+        } else {
+            dto.setEvents(List.of());
+        }
         return dto;
     }
 

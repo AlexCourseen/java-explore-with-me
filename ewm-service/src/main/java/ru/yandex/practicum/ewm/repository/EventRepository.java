@@ -63,5 +63,4 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                   @Param("rangeEnd") LocalDateTime rangeEnd);
 
     List<Event> findByInitiatorId(Pageable pageable, long userId);
-
 }
