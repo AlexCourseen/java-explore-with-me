@@ -229,12 +229,12 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private User checkUser(long userId) {
+    public User checkUser(long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("user с " + userId + " не найден"));
     }
 
-    private Event checkEvent(long eventId) {
+    public Event checkEvent(long eventId) {
         return eventRepository.findById(eventId).orElseThrow(() ->
                 new NotFoundException("Событие с " + eventId + " не найдено"));
     }
