@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.ewm.dto.user.NewUserRequestDto;
 import ru.yandex.practicum.ewm.dto.user.UserDto;
-import ru.yandex.practicum.ewm.exception.DuplicatedDataException;
+import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.mapper.UserMapper;
 import ru.yandex.practicum.ewm.model.User;
@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(NewUserRequestDto request) {
         if (userRepository.findByEmail(request.getEmail()) != null) {
-            throw new DuplicatedDataException("user c email: " + request.getEmail() + " уже существует");
+            throw new ConflictedDataException("user c email: " + request.getEmail() + " уже существует");
         }
         User user = UserMapper.mapNewUserRequestDtoToUser(request);
         userRepository.save(user);

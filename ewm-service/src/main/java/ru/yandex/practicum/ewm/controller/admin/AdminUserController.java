@@ -38,6 +38,7 @@ public class AdminUserController {
     }
 
     @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delUser(@PathVariable long userId) {
         userService.delUser(userId);
     }

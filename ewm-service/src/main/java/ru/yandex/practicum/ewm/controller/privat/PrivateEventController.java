@@ -62,7 +62,7 @@ public class PrivateEventController {
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createOutboundRequest(@PathVariable long userId,
-                                                         @RequestParam @Valid long eventId) {
+                                                         @RequestParam Long eventId) {
         return requestService.createOutboundRequest(userId, eventId);
     }
 

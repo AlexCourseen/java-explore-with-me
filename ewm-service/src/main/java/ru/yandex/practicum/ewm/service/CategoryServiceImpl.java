@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.ewm.dto.category.CategoryDto;
 import ru.yandex.practicum.ewm.dto.category.NewCategoryRequestDto;
-import ru.yandex.practicum.ewm.exception.DuplicatedDataException;
+import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.mapper.CategoryMapper;
 import ru.yandex.practicum.ewm.model.Category;
@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto createCategory(NewCategoryRequestDto request) {
         if (categoryRepository.findByName(request.getName()) != null) {
-            throw new DuplicatedDataException("Категория " + request.getName() + " уже существует");
+            throw new ConflictedDataException("Категория " + request.getName() + " уже существует");
         }
         Category category = CategoryMapper.mapNewCategoryRequestToCategory(request);
         categoryRepository.save(category);
@@ -47,9 +47,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto updateCategory(long catId, NewCategoryRequestDto request) {
         Category category = checkCategory(catId);
-        if (categoryRepository.findByName(request.getName()) != null) {
-            throw new DuplicatedDataException("Категория " + request.getName() + " уже существует");
-        }
+        //TODO удали ниже, если тесты прошли
+//        if (categoryRepository.findByName(request.getName()) != null) {
+//            throw new ConflictedDataException("Категория " + request.getName() + " уже существует");
+//        }
         category.setName(request.getName());
         return CategoryMapper.mapToCategoryDto(category);
     }

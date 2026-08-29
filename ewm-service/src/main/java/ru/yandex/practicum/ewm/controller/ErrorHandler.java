@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.ewm.model.ErrorResponse;
-import ru.yandex.practicum.ewm.exception.DuplicatedDataException;
+import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NoAccessException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.exception.ValidationException;
@@ -35,7 +35,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicatedData(final DuplicatedDataException e) {
+    public ErrorResponse handleConflictData(final ConflictedDataException e) {
         return new ErrorResponse(e.getMessage());
     }
 

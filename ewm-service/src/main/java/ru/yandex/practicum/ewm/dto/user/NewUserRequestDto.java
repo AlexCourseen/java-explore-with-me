@@ -1,5 +1,6 @@
 package ru.yandex.practicum.ewm.dto.user;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -13,6 +14,7 @@ public class NewUserRequestDto {
     private String name;
 
     @NotBlank(message = "email не может быть пустым")
+    @Email
     @Size(min = 6, max = 254, message = "email должно быть от 6 до 254 символов")
     private String email;
 

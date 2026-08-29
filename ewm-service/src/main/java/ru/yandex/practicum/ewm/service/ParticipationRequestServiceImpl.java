@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateRequest;
 import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateResult;
 import ru.yandex.practicum.ewm.dto.participationRequest.ParticipationRequestDto;
-import ru.yandex.practicum.ewm.exception.DuplicatedDataException;
+import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.exception.ValidationException;
 import ru.yandex.practicum.ewm.mapper.ParticipationRequestMapper;
@@ -35,19 +35,19 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Event event = eventService.checkEvent(eventId);
         User requester = eventService.checkUser(userId);
         if (requestRepository.findByRequesterIdAndEventId(userId, eventId) != null) {
-            throw new DuplicatedDataException("Повторный запрос на участие невозможен");
+            throw new ConflictedDataException("Повторный запрос на участие невозможен");
         }
         if (event.getInitiator().equals(requester)) {
             //TODO 409 код
-            throw new DuplicatedDataException("Невозможно создать запрос на участие в своем событие");
+            throw new ConflictedDataException("Невозможно создать запрос на участие в своем событие");
         }
         if (!event.getState().equals(State.PUBLISHED)) {
             //TODO 409 код
-            throw new DuplicatedDataException("Невозможно участвовать в неопубликованном событие");
+            throw new ConflictedDataException("Невозможно участвовать в неопубликованном событие");
         }
         if (event.getConfirmedRequests() == event.getParticipantLimit()) {
             //TODO 409 код
-            throw new DuplicatedDataException("Достигнут лимит запросов на участие");
+            throw new ConflictedDataException("Достигнут лимит запросов на участие");
         }
         ParticipationRequest request = new ParticipationRequest();
         request.setRequester(requester);
@@ -77,7 +77,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 .findFirst()
                 .ifPresent(r -> {
                     //TODO 409 код
-                    throw new DuplicatedDataException("Заявка с id=" + r.getId() +
+                    throw new ConflictedDataException("Заявка с id=" + r.getId() +
                             " не в состоянии Ожидания подтверждения");
                 });
         EventRequestStatusUpdateResult updateResult = new EventRequestStatusUpdateResult();
@@ -111,7 +111,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                             .map(ParticipationRequestMapper::mapToParticipationRequestDto)
                             .toList());
                     //TODO 409 код
-                    throw new DuplicatedDataException("Достигнут лимит заявок на участие");
+                    throw new ConflictedDataException("Достигнут лимит заявок на участие");
                 }
             }
         }

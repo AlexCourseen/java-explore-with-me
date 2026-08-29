@@ -11,7 +11,7 @@ import ru.yandex.practicum.ewm.dto.event.NewEventDto;
 import ru.yandex.practicum.ewm.dto.event.UpdateEventAdminRequest;
 import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.yandex.practicum.ewm.dto.event.UpdateEventUserRequest;
-import ru.yandex.practicum.ewm.exception.DuplicatedDataException;
+import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.exception.ValidationException;
 import ru.yandex.practicum.ewm.mapper.EventMapper;
@@ -157,10 +157,12 @@ public class EventServiceImpl implements EventService {
         if (request.hasStateAction()) {
             StateAction stateAction = request.getStateAction();
             if (isEventPublished(event)) {
-                //TODO Сделать код ошибки 409
-                throw new ValidationException("Невозможно изменить событие в статусе PUBLISHED");
+                throw new ConflictedDataException("Невозможно изменить событие в статусе PUBLISHED");
             }
             if (stateAction.equals(StateAction.PUBLISH_EVENT)) {
+                if(event.getState().equals(CANCELED)) {
+                    throw new ConflictedDataException("Невозможна публикация отмененного события");
+                }
                 event.setState(PUBLISHED);
             }
             if (stateAction.equals(REJECT_EVENT)) {
@@ -229,7 +231,7 @@ public class EventServiceImpl implements EventService {
     private void checkEventDate(LocalDateTime eventDate) {
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
             //TODO Сделать код ошибки 409
-            throw new DuplicatedDataException("должно содержать дату, которая еще не наступила");
+            throw new ConflictedDataException("должно содержать дату, которая еще не наступила");
         }
     }
 
