@@ -15,7 +15,11 @@ import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.dto.event.NewEventDto;
 import ru.yandex.practicum.ewm.dto.event.UpdateEventUserRequest;
+import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateRequest;
+import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateResult;
+import ru.yandex.practicum.ewm.dto.participationRequest.ParticipationRequestDto;
 import ru.yandex.practicum.ewm.service.EventService;
+import ru.yandex.practicum.ewm.service.ParticipationRequestService;
 
 import java.util.Collection;
 
@@ -24,6 +28,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class PrivateEventController {
     private final EventService eventService;
+    private final ParticipationRequestService requestService;
 
     @PostMapping("/{userId}/events")
     public EventFullDto createEvent(@PathVariable long userId,
@@ -49,5 +54,35 @@ public class PrivateEventController {
                                       @PathVariable long eventId,
                                       @RequestBody UpdateEventUserRequest request) {
         return eventService.updateEventByUser(eventId, userId, request);
+    }
+
+    @PostMapping("/{userId}/requests")
+    public ParticipationRequestDto createOutboundRequest(@PathVariable long userId,
+                                                         @RequestParam long eventId) {
+        return requestService.createOutboundRequest(userId, eventId);
+    }
+
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
+    public ParticipationRequestDto cancelOutboundRequest(@PathVariable long userId,
+                                                         @PathVariable long requestId) {
+        return requestService.cancelOutboundRequest(userId, requestId);
+    }
+
+    @GetMapping("/users/{userId}/requests")
+    public Collection<ParticipationRequestDto> getUsersOutboundRequests(@PathVariable long userId) {
+        return requestService.getUsersOutboundRequests(userId);
+    }
+
+    @GetMapping("/users/{userId}/events/{eventId}/requests")
+    public Collection<ParticipationRequestDto> getUsersInboundRequests(@PathVariable long userId,
+                                                                       @PathVariable long eventId) {
+        return requestService.getUsersInboundRequests(userId, eventId);
+    }
+
+    @PatchMapping("/users/{userId}/events/{eventId}/requests")
+    public EventRequestStatusUpdateResult updateInboundRequests(@PathVariable long userId,
+                                                                @PathVariable long eventId,
+                                                                @RequestBody @Valid EventRequestStatusUpdateRequest request) {
+        return requestService.updateInboundRequests(userId, eventId, request);
     }
 }
