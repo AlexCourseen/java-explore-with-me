@@ -87,7 +87,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             }
             RequestStatus requestStatus = request.getStatus();
             if (requestStatus.equals(RequestStatus.REJECTED)) {
-                requests.forEach(r -> r.setStatus(RequestStatus.CANCELED));
+                requests.forEach(r -> r.setStatus(RequestStatus.REJECTED));
                 updateResult.setRejectedRequests(requests.stream()
                         .map(ParticipationRequestMapper::mapToParticipationRequestDto)
                         .toList());

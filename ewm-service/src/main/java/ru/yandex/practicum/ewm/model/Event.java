@@ -28,7 +28,7 @@ public class Event {
     private Long id;
 
     @Column(name = "views")
-    private int views;
+    private long views;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state")

@@ -58,7 +58,6 @@ public class EventServiceImpl implements EventService {
         if (!isEventPublished(event)) {
             throw new NotFoundException("Событие с " + eventId + " не найдено");
         }
-        EventFullDto dto = EventMapper.mapToEventFullDto(event);
         String uri = "/events/" + eventId;
         List<ViewStatsDto> response = statsClient.getStats(
                 event.getCreatedOn().format(formatter),
@@ -68,9 +67,9 @@ public class EventServiceImpl implements EventService {
         );
         if (!response.isEmpty()) {
             long actualHits = response.getFirst().getHits();
-            dto.setViews(actualHits);
+            event.setViews(actualHits);
         }
-        return dto;
+        return EventMapper.mapToEventFullDto(event);
     }
 
     @Override
@@ -192,7 +191,7 @@ public class EventServiceImpl implements EventService {
         checkUser(userId);
         Event event = checkEvent(eventId);
         if (isEventPublished(event)) {
-            throw new ValidationException("Невозможно изменить событие в статусе PUBLISHED");
+            throw new ConflictedDataException("Невозможно изменить событие в статусе PUBLISHED");
         }
         updateEventFields(event, request);
         if (request.hasStateAction()) {
