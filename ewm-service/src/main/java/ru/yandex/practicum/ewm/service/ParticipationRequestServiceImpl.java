@@ -43,11 +43,11 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (!event.getState().equals(State.PUBLISHED)) {
             throw new ConflictedDataException("Невозможно участвовать в неопубликованном событие");
         }
-        if (event.getParticipantLimit() > 0 && (event.getConfirmedRequests() >= event.getParticipantLimit())) {
+        if (event.getParticipantLimit() > 0 && event.getConfirmedRequests() == event.getParticipantLimit()) {
             throw new ConflictedDataException("Достигнут лимит запросов на участие");
         }
         ParticipationRequest request = new ParticipationRequest();
-        if (event.getParticipantLimit() == 0 && !event.isRequestModeration()) {
+        if (event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
         } else {
             request.setStatus(RequestStatus.PENDING);
@@ -77,14 +77,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 .filter(r -> !r.getStatus().equals(RequestStatus.PENDING))
                 .findFirst()
                 .ifPresent(r -> {
-                    //TODO 409 код
                     throw new ConflictedDataException("Заявка с id=" + r.getId() +
                             " не в состоянии Ожидания подтверждения");
                 });
         EventRequestStatusUpdateResult updateResult = new EventRequestStatusUpdateResult();
         if (event.getParticipantLimit() > 0 && event.isRequestModeration()) {
             RequestStatus requestStatus = request.getStatus();
-            if (requestStatus.equals(RequestStatus.CANCELED)) {
+            if (requestStatus.equals(RequestStatus.REJECTED)) {
                 requests.forEach(r -> r.setStatus(RequestStatus.CANCELED));
                 updateResult.setRejectedRequests(requests.stream()
                         .map(ParticipationRequestMapper::mapToParticipationRequestDto)
@@ -111,7 +110,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                     updateResult.setRejectedRequests(rejectedRequests.stream()
                             .map(ParticipationRequestMapper::mapToParticipationRequestDto)
                             .toList());
-                    //TODO 409 код
                     throw new ConflictedDataException("Достигнут лимит заявок на участие");
                 }
             }
