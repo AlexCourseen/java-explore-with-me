@@ -11,6 +11,7 @@ import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.mapper.CategoryMapper;
 import ru.yandex.practicum.ewm.model.Category;
 import ru.yandex.practicum.ewm.repository.CategoryRepository;
+import ru.yandex.practicum.ewm.repository.EventRepository;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public Collection<CategoryDto> getCategories(int from, int size) {
@@ -47,10 +49,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto updateCategory(long catId, NewCategoryRequestDto request) {
         Category category = checkCategory(catId);
-        //TODO удали ниже, если тесты прошли
-//        if (categoryRepository.findByName(request.getName()) != null) {
-//            throw new ConflictedDataException("Категория " + request.getName() + " уже существует");
-//        }
+        Category existing = categoryRepository.findByName(request.getName());
+        if (existing != null && existing.getId() != catId) {
+            throw new ConflictedDataException("Категория " + request.getName() + " уже существует");
+        }
         category.setName(request.getName());
         return CategoryMapper.mapToCategoryDto(category);
     }
@@ -58,6 +60,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delCategory(long catId) {
         Category category = checkCategory(catId);
+        if (!eventRepository.findByCategoryId(catId).isEmpty()) {
+            throw new ConflictedDataException("У категории есть связанные события");
+        }
         categoryRepository.delete(category);
     }
 

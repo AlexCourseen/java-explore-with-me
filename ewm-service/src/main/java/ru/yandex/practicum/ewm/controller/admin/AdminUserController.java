@@ -18,6 +18,7 @@ import ru.yandex.practicum.ewm.dto.user.UserDto;
 import ru.yandex.practicum.ewm.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/admin/users")
@@ -27,8 +28,9 @@ public class AdminUserController {
 
     @GetMapping()
     public Collection<UserDto> getUsers(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                        @RequestParam(defaultValue = "10") @PositiveOrZero int size) {
-        return userService.getUsers(from, size);
+                                        @RequestParam(defaultValue = "10") @PositiveOrZero int size,
+                                        @RequestParam(required = false)List<Long> ids) {
+        return userService.getUsers(from, size, ids);
     }
 
     @PostMapping()

@@ -45,7 +45,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             //TODO 409 код
             throw new ConflictedDataException("Невозможно участвовать в неопубликованном событие");
         }
-        if (event.getConfirmedRequests() == event.getParticipantLimit()) {
+        if (event.getParticipantLimit() > 0 && (event.getConfirmedRequests() >= event.getParticipantLimit())) {
             //TODO 409 код
             throw new ConflictedDataException("Достигнут лимит запросов на участие");
         }

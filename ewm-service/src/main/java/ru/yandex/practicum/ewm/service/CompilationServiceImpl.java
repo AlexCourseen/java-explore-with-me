@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.ewm.dto.compilation.CompilationDto;
 import ru.yandex.practicum.ewm.dto.compilation.NewCompilationDto;
 import ru.yandex.practicum.ewm.dto.compilation.UpdateCompilationRequest;
-import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.exception.ValidationException;
 import ru.yandex.practicum.ewm.mapper.CompilationMapper;
@@ -57,9 +56,6 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void delCompilation(long compId) {
         Compilation compilation = checkCompilation(compId);
-        if (!compilation.getEvents().isEmpty()) {
-            throw new ConflictedDataException("У категории есть связанные события");
-        }
         compilationRepository.deleteById(compId);
     }
 

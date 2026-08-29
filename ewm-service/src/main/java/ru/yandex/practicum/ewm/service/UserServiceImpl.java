@@ -12,6 +12,7 @@ import ru.yandex.practicum.ewm.model.User;
 import ru.yandex.practicum.ewm.repository.UserRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,8 +21,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public Collection<UserDto> getUsers(int from, int size) {
-        return userRepository.getUsers(PageRequest.of(from, size)).stream()
+    public Collection<UserDto> getUsers(int from, int size, List<Long> ids) {
+        return userRepository.getUsers(PageRequest.of(from, size),ids).stream()
                 .map(UserMapper::mapToUserDto)
                 .collect(Collectors.toList());
     }

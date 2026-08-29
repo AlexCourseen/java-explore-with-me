@@ -177,13 +177,12 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateEventByUser(long eventId, long userId, UpdateEventUserRequest request) {
         checkUser(userId);
         Event event = checkEvent(eventId);
+        if (isEventPublished(event)) {
+            throw new ValidationException("Невозможно изменить событие в статусе PUBLISHED");
+        }
         updateEventFields(event, request);
         if (request.hasStateAction()) {
             StateAction stateAction = request.getStateAction();
-            if (isEventPublished(event)) {
-                //TODO Сделать код ошибки 409
-                throw new ValidationException("Невозможно изменить событие в статусе PUBLISHED");
-            }
             if (stateAction.equals(StateAction.SEND_TO_REVIEW)) {
                 event.setState(PENDING);
             }
