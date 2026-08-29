@@ -1,6 +1,7 @@
 package ru.yandex.practicum.ewm.controller.privat;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,7 +59,7 @@ public class PrivateEventController {
 
     @PostMapping("/{userId}/requests")
     public ParticipationRequestDto createOutboundRequest(@PathVariable long userId,
-                                                         @RequestParam long eventId) {
+                                                         @RequestParam @Positive long eventId) {
         return requestService.createOutboundRequest(userId, eventId);
     }
 

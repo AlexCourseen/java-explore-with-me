@@ -1,5 +1,6 @@
 package ru.yandex.practicum.ewm.dto.event;
 
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class UpdateEventRequestDto {
     private String eventDate;
     private Location location;
     private Boolean paid;
+    @PositiveOrZero
     private Integer participantLimit;
     private Boolean requestModeration;
     @Size(min = 3, max = 120, message = "Заголовок должен быть от 3 до 120 символов")

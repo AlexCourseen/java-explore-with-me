@@ -51,6 +51,9 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto getEvent(long eventId) {
         Event event = checkEvent(eventId);
+        if (!isEventPublished(event)) {
+            throw new NotFoundException("Событие с " + eventId + " не найдено");
+        }
         event.setViews(event.getViews() + 1);
         eventRepository.save(event);
         return EventMapper.mapToEventFullDto(event);
@@ -150,8 +153,7 @@ public class EventServiceImpl implements EventService {
         updateEventFields(event, request);
         if (request.hasStateAction()) {
             StateAction stateAction = request.getStateAction();
-            State eventState = event.getState();
-            if (eventState.equals(PUBLISHED)) {
+            if (isEventPublished(event)) {
                 //TODO Сделать код ошибки 409
                 throw new ValidationException("Невозможно изменить событие в статусе PUBLISHED");
             }
@@ -173,8 +175,7 @@ public class EventServiceImpl implements EventService {
         updateEventFields(event, request);
         if (request.hasStateAction()) {
             StateAction stateAction = request.getStateAction();
-            State eventState = event.getState();
-            if (eventState.equals(PUBLISHED)) {
+            if (isEventPublished(event)) {
                 //TODO Сделать код ошибки 409
                 throw new ValidationException("Невозможно изменить событие в статусе PUBLISHED");
             }
@@ -227,6 +228,10 @@ public class EventServiceImpl implements EventService {
             //TODO Сделать код ошибки 409
             throw new DuplicatedDataException("должно содержать дату, которая еще не наступила");
         }
+    }
+
+    private boolean isEventPublished(Event event) {
+        return event.getState().equals(PUBLISHED);
     }
 
     public User checkUser(long userId) {

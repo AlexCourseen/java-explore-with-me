@@ -2,6 +2,7 @@ package ru.yandex.practicum.ewm.dto.event;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,10 @@ public class NewEventDto {
     private Location location;
 
     private boolean paid;
+
+    @PositiveOrZero
     private int participantLimit;
+
     private boolean requestModeration;
 
     @NotBlank(message = "Заголовок не может быть пустым")
