@@ -160,7 +160,7 @@ public class EventServiceImpl implements EventService {
                 throw new ConflictedDataException("Невозможно изменить событие в статусе PUBLISHED");
             }
             if (stateAction.equals(StateAction.PUBLISH_EVENT)) {
-                if(event.getState().equals(CANCELED)) {
+                if (event.getState().equals(CANCELED)) {
                     throw new ConflictedDataException("Невозможна публикация отмененного события");
                 }
                 event.setState(PUBLISHED);
