@@ -82,6 +82,9 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 });
         EventRequestStatusUpdateResult updateResult = new EventRequestStatusUpdateResult();
         if (event.getParticipantLimit() > 0 && event.isRequestModeration()) {
+            if (event.getParticipantLimit() == event.getConfirmedRequests()) {
+                throw new ConflictedDataException("Достигнут лимит заявок на участие");
+            }
             RequestStatus requestStatus = request.getStatus();
             if (requestStatus.equals(RequestStatus.REJECTED)) {
                 requests.forEach(r -> r.setStatus(RequestStatus.CANCELED));

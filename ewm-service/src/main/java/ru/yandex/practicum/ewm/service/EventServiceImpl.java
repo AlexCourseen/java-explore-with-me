@@ -5,6 +5,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.ewm.client.StatsClient;
+import ru.yandex.practicum.ewm.dto.ViewStatsDto;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.dto.event.NewEventDto;
@@ -46,6 +48,8 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final StatsClient statsClient;
+
 
     @Override
     @Transactional
@@ -54,9 +58,19 @@ public class EventServiceImpl implements EventService {
         if (!isEventPublished(event)) {
             throw new NotFoundException("Событие с " + eventId + " не найдено");
         }
-        event.setViews(event.getViews() + 1);
-        eventRepository.save(event);
-        return EventMapper.mapToEventFullDto(event);
+        EventFullDto dto = EventMapper.mapToEventFullDto(event);
+        String uri = "/events/" + eventId;
+        List<ViewStatsDto> response = statsClient.getStats(
+                event.getCreatedOn().format(formatter),
+                LocalDateTime.now().format(formatter),
+                List.of(uri),
+                true
+        );
+        if (!response.isEmpty()) {
+            long actualHits = response.getFirst().getHits();
+            dto.setViews(actualHits);
+        }
+        return dto;
     }
 
     @Override

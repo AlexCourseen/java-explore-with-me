@@ -15,6 +15,7 @@ import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.service.EventService;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class PublicEventController {
     private final EventService eventService;
     private final StatsClient statsClient;
     private static final String APP = "ewm-service";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping()
     public Collection<EventShortDto> getEvents(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
@@ -41,7 +43,7 @@ public class PublicEventController {
         hitStats.setApp(APP);
         hitStats.setIp(request.getRemoteAddr());
         hitStats.setUri(request.getRequestURI());
-        hitStats.setTimestamp(LocalDateTime.now().toString());
+        hitStats.setTimestamp(LocalDateTime.now().format(formatter));
         statsClient.createHit(hitStats);
         return eventService.getPublishedEvents(from, size, sort, text, categories, paid, rangeStart, rangeEnd,
                 onlyAvailable);
@@ -53,7 +55,7 @@ public class PublicEventController {
         hitStats.setApp(APP);
         hitStats.setIp(request.getRemoteAddr());
         hitStats.setUri(request.getRequestURI());
-        hitStats.setTimestamp(LocalDateTime.now().toString());
+        hitStats.setTimestamp(LocalDateTime.now().format(formatter));
         statsClient.createHit(hitStats);
         return eventService.getEvent(eventId);
     }
