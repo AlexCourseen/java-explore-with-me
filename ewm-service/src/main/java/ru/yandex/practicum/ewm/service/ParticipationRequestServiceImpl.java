@@ -38,22 +38,23 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ConflictedDataException("Повторный запрос на участие невозможен");
         }
         if (event.getInitiator().equals(requester)) {
-            //TODO 409 код
             throw new ConflictedDataException("Невозможно создать запрос на участие в своем событие");
         }
         if (!event.getState().equals(State.PUBLISHED)) {
-            //TODO 409 код
             throw new ConflictedDataException("Невозможно участвовать в неопубликованном событие");
         }
         if (event.getParticipantLimit() > 0 && (event.getConfirmedRequests() >= event.getParticipantLimit())) {
-            //TODO 409 код
             throw new ConflictedDataException("Достигнут лимит запросов на участие");
         }
         ParticipationRequest request = new ParticipationRequest();
+        if (event.getParticipantLimit() == 0 && !event.isRequestModeration()) {
+            request.setStatus(RequestStatus.CONFIRMED);
+        } else {
+            request.setStatus(RequestStatus.PENDING);
+        }
         request.setRequester(requester);
         request.setEvent(event);
         request.setCreated(LocalDateTime.now());
-        request.setStatus(RequestStatus.PENDING);
         requestRepository.save(request);
         return ParticipationRequestMapper.mapToParticipationRequestDto(request);
     }
@@ -61,7 +62,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     @Override
     public ParticipationRequestDto cancelOutboundRequest(long userId, long requestId) {
         ParticipationRequest participationRequest = checkParticipationRequest(requestId);
-        participationRequest.setStatus(RequestStatus.REJECTED);
+        participationRequest.setStatus(RequestStatus.CANCELED);
         return ParticipationRequestMapper.mapToParticipationRequestDto(participationRequest);
     }
 
@@ -83,8 +84,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         EventRequestStatusUpdateResult updateResult = new EventRequestStatusUpdateResult();
         if (event.getParticipantLimit() > 0 && event.isRequestModeration()) {
             RequestStatus requestStatus = request.getStatus();
-            if (requestStatus.equals(RequestStatus.REJECTED)) {
-                requests.forEach(r -> r.setStatus(RequestStatus.REJECTED));
+            if (requestStatus.equals(RequestStatus.CANCELED)) {
+                requests.forEach(r -> r.setStatus(RequestStatus.CANCELED));
                 updateResult.setRejectedRequests(requests.stream()
                         .map(ParticipationRequestMapper::mapToParticipationRequestDto)
                         .toList());
@@ -94,7 +95,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 List<ParticipationRequest> rejectedRequests = new ArrayList<>();
                 for (ParticipationRequest r : requests) {
                     if (event.getParticipantLimit() == event.getConfirmedRequests()) {
-                        r.setStatus(RequestStatus.REJECTED);
+                        r.setStatus(RequestStatus.CANCELED);
                         rejectedRequests.add(r);
                     }
                     r.setStatus(RequestStatus.CONFIRMED);

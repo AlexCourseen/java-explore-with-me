@@ -229,8 +229,7 @@ public class EventServiceImpl implements EventService {
 
     private void checkEventDate(LocalDateTime eventDate) {
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
-            //TODO Сделать код ошибки 409
-            throw new ConflictedDataException("должно содержать дату, которая еще не наступила");
+            throw new ValidationException("должно содержать дату, которая еще не наступила");
         }
     }
 

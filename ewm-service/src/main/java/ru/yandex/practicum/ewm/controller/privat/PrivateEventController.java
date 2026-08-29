@@ -1,11 +1,9 @@
 package ru.yandex.practicum.ewm.controller.privat;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +28,6 @@ import java.util.Collection;
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
-@Validated
 public class PrivateEventController {
     private final EventService eventService;
     private final ParticipationRequestService requestService;
@@ -65,7 +62,7 @@ public class PrivateEventController {
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createOutboundRequest(@PathVariable long userId,
-                                                         @RequestParam @NotNull Long eventId) {
+                                                         @RequestParam Long eventId) {
         return requestService.createOutboundRequest(userId, eventId);
     }
 
