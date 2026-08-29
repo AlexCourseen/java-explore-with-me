@@ -32,8 +32,7 @@ public class NewEventDto {
 
     @PositiveOrZero
     private int participantLimit;
-
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
     @NotBlank(message = "Заголовок не может быть пустым")
     @Size(min = 3, max = 120, message = "Заголовок должен быть от 3 до 120 символов")

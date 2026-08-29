@@ -1,9 +1,9 @@
 package ru.yandex.practicum.ewm.controller.privat;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
@@ -32,6 +33,7 @@ public class PrivateEventController {
     private final ParticipationRequestService requestService;
 
     @PostMapping("/{userId}/events")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable long userId,
                                     @RequestBody @Valid NewEventDto request) {
         return eventService.createEvent(userId, request);
@@ -53,13 +55,14 @@ public class PrivateEventController {
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto getUsersEvent(@PathVariable long userId,
                                       @PathVariable long eventId,
-                                      @RequestBody UpdateEventUserRequest request) {
+                                      @RequestBody @Valid UpdateEventUserRequest request) {
         return eventService.updateEventByUser(eventId, userId, request);
     }
 
     @PostMapping("/{userId}/requests")
+    @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createOutboundRequest(@PathVariable long userId,
-                                                         @RequestParam @Positive long eventId) {
+                                                         @RequestParam @Valid long eventId) {
         return requestService.createOutboundRequest(userId, eventId);
     }
 

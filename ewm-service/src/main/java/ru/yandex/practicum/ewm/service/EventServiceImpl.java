@@ -135,6 +135,9 @@ public class EventServiceImpl implements EventService {
         LocalDateTime eventDate = LocalDateTime.parse(request.getEventDate(), formatter);
         checkEventDate(eventDate);
         Location location = checkLocation(request.getLocation());
+        if (request.getRequestModeration() == null) {
+            request.setRequestModeration(true);
+        }
         Event event = EventMapper.mapNewEventDtoToEvent(request);
         event.setEventDate(eventDate);
         event.setCategory(category);

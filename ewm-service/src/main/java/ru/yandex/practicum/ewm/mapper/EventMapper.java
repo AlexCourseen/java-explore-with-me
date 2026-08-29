@@ -16,7 +16,7 @@ public final class EventMapper {
         event.setDescription(dto.getDescription());
         event.setPaid(dto.isPaid());
         event.setParticipantLimit(dto.getParticipantLimit());
-        event.setRequestModeration(dto.isRequestModeration());
+        event.setRequestModeration(dto.getRequestModeration());
         event.setTitle(dto.getTitle());
         return event;
     }
