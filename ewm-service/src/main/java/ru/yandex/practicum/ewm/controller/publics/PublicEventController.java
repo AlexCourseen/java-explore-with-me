@@ -24,7 +24,7 @@ import java.util.List;
 public class PublicEventController {
     private final EventService eventService;
     private final StatsClient statsClient;
-    private final static String APP = "ewm-service";
+    private final String APP = "ewm-service";
 
     @GetMapping()
     public Collection<EventShortDto> getEvents(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
