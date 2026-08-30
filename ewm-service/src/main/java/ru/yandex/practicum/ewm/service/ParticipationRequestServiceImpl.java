@@ -97,7 +97,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 List<ParticipationRequest> rejectedRequests = new ArrayList<>();
                 for (ParticipationRequest r : requests) {
                     if (event.getParticipantLimit() == event.getConfirmedRequests()) {
-                        r.setStatus(RequestStatus.CANCELED);
+                        r.setStatus(RequestStatus.REJECTED);
                         rejectedRequests.add(r);
                     }
                     r.setStatus(RequestStatus.CONFIRMED);

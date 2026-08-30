@@ -15,14 +15,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e " +
             "WHERE e.state = 'PUBLISHED' " +
             "AND (CAST(:text AS string) IS NULL OR " +
-            "LOWER(e.annotation) LIKE CONCAT('%', CAST(:text AS string), '%') OR " +
-            "LOWER(e.description) LIKE CONCAT('%', CAST(:text AS string), '%')) " +
+            "LOWER(e.annotation) LIKE CONCAT('%', LOWER(CAST(:text AS string)), '%') OR " +
+            "LOWER(e.description) LIKE CONCAT('%', LOWER(CAST(:text AS string)), '%')) " +
             "AND (:catIds IS NULL OR e.category.id IN :catIds) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (CAST(:now AS timestamp) IS NULL OR e.eventDate > :now) " +
             "AND (CAST(:start AS timestamp) IS NULL OR e.eventDate >= :start) " +
             "AND (CAST(:end AS timestamp) IS NULL OR e.eventDate <= :end) " +
-            "AND e.participantLimit = 0 OR e.confirmedRequests < e.participantLimit ")
+            "AND (e.participantLimit = 0 OR e.confirmedRequests < e.participantLimit) ")
     List<Event> findEventsWithParamsOnlyAvailable(Pageable pageable,
                                                   @Param("text") String text,
                                                   @Param("catIds") List<Long> catIds,
@@ -34,8 +34,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e " +
             "WHERE e.state = 'PUBLISHED' " +
             "AND (CAST(:text AS string) IS NULL OR " +
-            "LOWER(e.annotation) LIKE CONCAT('%', CAST(:text AS string), '%') OR " +
-            "LOWER(e.description) LIKE CONCAT('%', CAST(:text AS string), '%')) " +
+            "LOWER(e.annotation) LIKE CONCAT('%', LOWER(CAST(:text AS string)), '%') OR " +
+            "LOWER(e.description) LIKE CONCAT('%', LOWER(CAST(:text AS string)), '%')) " +
             "AND (:catIds IS NULL OR e.category.id IN :catIds) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (CAST(:now AS timestamp) IS NULL OR e.eventDate > :now) " +
