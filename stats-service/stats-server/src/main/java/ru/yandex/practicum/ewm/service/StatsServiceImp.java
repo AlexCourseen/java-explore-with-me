@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.ewm.dto.EndpointHitDto;
 import ru.yandex.practicum.ewm.dto.ViewStatsDto;
+import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.mapper.HitMapper;
 import ru.yandex.practicum.ewm.repository.StatsRepository;
 
@@ -29,7 +30,7 @@ public class StatsServiceImp implements StatsService {
         LocalDateTime endTime = LocalDateTime.parse(end, formatter);
 
         if (startTime.isAfter(endTime)) {
-            throw new IllegalArgumentException("Дата начала не может быть позже даты окончания");
+            throw new ConflictedDataException("Дата начала не может быть позже даты окончания");
         }
 
         if (unique) {

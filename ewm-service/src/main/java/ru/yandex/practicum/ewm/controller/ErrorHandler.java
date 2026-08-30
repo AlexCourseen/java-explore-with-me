@@ -14,7 +14,6 @@ import ru.yandex.practicum.ewm.model.ErrorResponse;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    //MethodArgumentNotValidException.class
     @ExceptionHandler({ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidation(final ValidationException e) {
