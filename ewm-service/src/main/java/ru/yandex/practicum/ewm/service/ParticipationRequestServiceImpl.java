@@ -95,16 +95,18 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             if (requestStatus.equals(RequestStatus.CONFIRMED)) {
                 List<ParticipationRequest> confirmedRequests = new ArrayList<>();
                 List<ParticipationRequest> rejectedRequests = new ArrayList<>();
+                int confRequests = event.getConfirmedRequests();
                 for (ParticipationRequest r : requests) {
-                    if (event.getParticipantLimit() == event.getConfirmedRequests()) {
+                    if (event.getParticipantLimit() == confRequests) {
                         r.setStatus(RequestStatus.REJECTED);
                         rejectedRequests.add(r);
                     }
                     r.setStatus(RequestStatus.CONFIRMED);
                     confirmedRequests.add(r);
-                    event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                    confRequests++;
                 }
                 if (!confirmedRequests.isEmpty()) {
+                    event.setConfirmedRequests(confRequests);
                     updateResult.setConfirmedRequests(confirmedRequests.stream()
                             .map(ParticipationRequestMapper::mapToParticipationRequestDto)
                             .toList());
