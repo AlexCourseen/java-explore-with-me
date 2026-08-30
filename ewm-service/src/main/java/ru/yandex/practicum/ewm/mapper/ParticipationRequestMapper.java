@@ -13,6 +13,7 @@ public final class ParticipationRequestMapper {
         dto.setRequester(participationRequest.getRequester().getId());
         dto.setEvent(participationRequest.getEvent().getId());
         dto.setStatus(participationRequest.getStatus());
+        dto.setCreated(participationRequest.getCreated());
         return dto;
     }
 }
