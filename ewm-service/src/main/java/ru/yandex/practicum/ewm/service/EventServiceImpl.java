@@ -52,7 +52,6 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    @Transactional
     public EventFullDto getEvent(long eventId) {
         Event event = checkEvent(eventId);
         if (!isEventPublished(event)) {
@@ -83,7 +82,7 @@ public class EventServiceImpl implements EventService {
             startTime = LocalDateTime.parse(rangeStart, formatter);
             endTime = LocalDateTime.parse(rangeEnd, formatter);
             if (startTime.isAfter(endTime)) {
-                throw new IllegalArgumentException("Дата начала не может быть позже даты окончания");
+                throw new ConflictedDataException("Дата начала не может быть позже даты окончания");
             }
         } else {
             now = LocalDateTime.now();
