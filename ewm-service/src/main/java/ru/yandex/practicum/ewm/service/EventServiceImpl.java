@@ -83,7 +83,7 @@ public class EventServiceImpl implements EventService {
             startTime = LocalDateTime.parse(rangeStart, formatter);
             endTime = LocalDateTime.parse(rangeEnd, formatter);
             if (startTime.isAfter(endTime)) {
-                throw new ConflictedDataException("Дата начала не может быть позже даты окончания");
+                throw new ValidationException("Дата начала не может быть позже даты окончания");
             }
         } else {
             now = LocalDateTime.now();
