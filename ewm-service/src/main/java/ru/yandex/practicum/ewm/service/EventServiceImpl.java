@@ -52,20 +52,21 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
+    @Transactional
     public EventFullDto getEvent(long eventId) {
         Event event = checkEvent(eventId);
         if (!isEventPublished(event)) {
             throw new NotFoundException("Событие с " + eventId + " не найдено");
         }
         String uri = "/events/" + eventId;
-        List<ViewStatsDto> response = statsClient.getStats(
+        List<ViewStatsDto> statsDtos = statsClient.getStats(
                 event.getCreatedOn().format(formatter),
                 LocalDateTime.now().format(formatter),
                 List.of(uri),
                 true
         );
-        if (!response.isEmpty()) {
-            long actualHits = response.getFirst().getHits();
+        if (!statsDtos.isEmpty()) {
+            long actualHits = statsDtos.getFirst().getHits();
             event.setViews(actualHits);
         }
         return EventMapper.mapToEventFullDto(event);
