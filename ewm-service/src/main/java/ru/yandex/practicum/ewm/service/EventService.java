@@ -7,6 +7,7 @@ import ru.yandex.practicum.ewm.dto.event.UpdateEventAdminRequest;
 import ru.yandex.practicum.ewm.dto.event.UpdateEventUserRequest;
 import ru.yandex.practicum.ewm.model.State;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,8 +22,8 @@ public interface EventService {
                                                  String text,
                                                  List<Long> catIds,
                                                  Boolean paid,
-                                                 String rangeStart,
-                                                 String rangeEnd,
+                                                 LocalDateTime rangeStart,
+                                                 LocalDateTime rangeEnd,
                                                  Boolean onlyAvailable);
 
     Collection<EventFullDto> getEventsByAdmin(int from,

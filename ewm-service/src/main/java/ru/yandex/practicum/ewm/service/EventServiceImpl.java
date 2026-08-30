@@ -59,14 +59,14 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Событие с " + eventId + " не найдено");
         }
         String uri = "/events/" + eventId;
-        List<ViewStatsDto> statsDtos = statsClient.getStats(
+        List<ViewStatsDto> stats = statsClient.getStats(
                 event.getCreatedOn().format(formatter),
                 LocalDateTime.now().format(formatter),
                 List.of(uri),
                 true
         );
-        if (!statsDtos.isEmpty()) {
-            long actualHits = statsDtos.getFirst().getHits();
+        if (!stats.isEmpty()) {
+            long actualHits = stats.getFirst().getHits();
             event.setViews(actualHits);
         }
         return EventMapper.mapToEventFullDto(event);
@@ -74,15 +74,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Collection<EventShortDto> getPublishedEvents(int from, int size, String sort, String text, List<Long> catIds,
-                                                        Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable) {
+                                                        Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable) {
         String search = (text != null && !text.isBlank()) ? text.toLowerCase() : null;
         LocalDateTime now = null;
-        LocalDateTime startTime = null;
-        LocalDateTime endTime = null;
-        if (rangeStart != null && !rangeStart.isBlank() && rangeEnd != null && !rangeEnd.isBlank()) {
-            startTime = LocalDateTime.parse(rangeStart, formatter);
-            endTime = LocalDateTime.parse(rangeEnd, formatter);
-            if (startTime.isAfter(endTime)) {
+        if (rangeStart != null && rangeEnd != null) {
+            if (rangeStart.isAfter(rangeEnd)) {
                 throw new ValidationException("Дата начала не может быть позже даты окончания");
             }
         } else {
@@ -99,13 +95,13 @@ public class EventServiceImpl implements EventService {
         if (onlyAvailable) {
             return eventRepository.findEventsWithParamsOnlyAvailable(
                             (PageRequest.of(from, size, sortBy)), search, catIds, paid,
-                            startTime, endTime, now).stream()
+                            rangeStart, rangeEnd, now).stream()
                     .map(EventMapper::mapToEventShortDto)
                     .collect(Collectors.toList());
         } else {
             return eventRepository.findEventsWithParams(
                             (PageRequest.of(from, size, sortBy)), search, catIds, paid,
-                            endTime, endTime, now).stream()
+                            rangeStart, rangeEnd, now).stream()
                     .map(EventMapper::mapToEventShortDto)
                     .collect(Collectors.toList());
         }

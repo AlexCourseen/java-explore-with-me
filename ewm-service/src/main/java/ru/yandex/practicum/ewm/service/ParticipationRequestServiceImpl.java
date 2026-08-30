@@ -100,10 +100,11 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                     if (event.getParticipantLimit() == confRequests) {
                         r.setStatus(RequestStatus.REJECTED);
                         rejectedRequests.add(r);
+                    } else {
+                        r.setStatus(RequestStatus.CONFIRMED);
+                        confirmedRequests.add(r);
+                        confRequests++;
                     }
-                    r.setStatus(RequestStatus.CONFIRMED);
-                    confirmedRequests.add(r);
-                    confRequests++;
                 }
                 if (!confirmedRequests.isEmpty()) {
                     event.setConfirmedRequests(confRequests);
