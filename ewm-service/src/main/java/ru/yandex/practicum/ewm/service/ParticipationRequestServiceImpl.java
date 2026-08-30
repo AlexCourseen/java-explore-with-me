@@ -15,6 +15,7 @@ import ru.yandex.practicum.ewm.model.ParticipationRequest;
 import ru.yandex.practicum.ewm.model.RequestStatus;
 import ru.yandex.practicum.ewm.model.State;
 import ru.yandex.practicum.ewm.model.User;
+import ru.yandex.practicum.ewm.repository.EventRepository;
 import ru.yandex.practicum.ewm.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
     private final ParticipationRequestRepository requestRepository;
+    private final EventRepository eventRepository;
     private final EventServiceImpl eventService;
 
     @Override
@@ -47,9 +49,11 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ConflictedDataException("Достигнут лимит запросов на участие");
         }
         ParticipationRequest request = new ParticipationRequest();
-        if (event.getParticipantLimit() == 0) {
+        if (event.getParticipantLimit() == 0 || !event.isRequestModeration()) {
             request.setStatus(RequestStatus.CONFIRMED);
-        } else if (event.getConfirmedRequests() < event.getParticipantLimit()) {
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+            eventRepository.save(event);
+        } else {
             request.setStatus(RequestStatus.PENDING);
         }
         request.setRequester(requester);
