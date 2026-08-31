@@ -3,6 +3,7 @@ package ru.yandex.practicum.ewm.controller.publics;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,8 +27,10 @@ import java.util.List;
 public class PublicEventController {
     private final EventService eventService;
     private final StatsClient statsClient;
-    private static final String APP = "ewm-service";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Value("${app.name}")
+    private String appName;
 
     @GetMapping()
     public Collection<EventShortDto> getEvents(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
@@ -42,11 +45,12 @@ public class PublicEventController {
                                                @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                HttpServletRequest request) {
-        EndpointHitDto hitStats = new EndpointHitDto();
-        hitStats.setApp(APP);
-        hitStats.setIp(request.getRemoteAddr());
-        hitStats.setUri(request.getRequestURI());
-        hitStats.setTimestamp(LocalDateTime.now().format(formatter));
+        EndpointHitDto hitStats = EndpointHitDto.builder()
+                .app(appName)
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
         statsClient.createHit(hitStats);
         return eventService.getPublishedEvents(from, size, sort, text, categories, paid, rangeStart, rangeEnd,
                 onlyAvailable);
@@ -54,11 +58,12 @@ public class PublicEventController {
 
     @GetMapping("/{eventId}")
     public EventFullDto getEvent(@PathVariable long eventId, HttpServletRequest request) {
-        EndpointHitDto hitStats = new EndpointHitDto();
-        hitStats.setApp(APP);
-        hitStats.setIp(request.getRemoteAddr());
-        hitStats.setUri(request.getRequestURI());
-        hitStats.setTimestamp(LocalDateTime.now().format(formatter));
+        EndpointHitDto hitStats = EndpointHitDto.builder()
+                .app(appName)
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
         statsClient.createHit(hitStats);
         return eventService.getEvent(eventId);
     }

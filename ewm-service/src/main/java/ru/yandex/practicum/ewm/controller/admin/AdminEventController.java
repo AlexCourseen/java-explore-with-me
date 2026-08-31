@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
-import ru.yandex.practicum.ewm.dto.event.UpdateEventAdminRequest;
+import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.yandex.practicum.ewm.model.State;
 import ru.yandex.practicum.ewm.service.EventService;
 
@@ -37,7 +37,7 @@ public class AdminEventController {
 
     @PatchMapping("/{eventId}")
     public EventFullDto updateEvent(@PathVariable long eventId,
-                                    @RequestBody @Valid UpdateEventAdminRequest request) {
+                                    @RequestBody @Valid UpdateEventRequestDto request) {
         return eventService.updateEventByAdmin(eventId, request);
     }
 }

@@ -10,9 +10,7 @@ import ru.yandex.practicum.ewm.dto.ViewStatsDto;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.dto.event.NewEventDto;
-import ru.yandex.practicum.ewm.dto.event.UpdateEventAdminRequest;
 import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
-import ru.yandex.practicum.ewm.dto.event.UpdateEventUserRequest;
 import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.exception.ValidationException;
@@ -52,7 +50,6 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    @Transactional
     public EventFullDto getEvent(long eventId) {
         Event event = checkEvent(eventId);
         if (!isEventPublished(event)) {
@@ -160,7 +157,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventFullDto updateEventByAdmin(long eventId, UpdateEventAdminRequest request) {
+    public EventFullDto updateEventByAdmin(long eventId, UpdateEventRequestDto request) {
         Event event = checkEvent(eventId);
         updateEventFields(event, request);
         if (request.hasStateAction()) {
@@ -183,7 +180,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventFullDto updateEventByUser(long eventId, long userId, UpdateEventUserRequest request) {
+    public EventFullDto updateEventByUser(long eventId, long userId, UpdateEventRequestDto request) {
         checkUser(userId);
         Event event = checkEvent(eventId);
         if (isEventPublished(event)) {

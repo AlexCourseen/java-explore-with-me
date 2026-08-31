@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.dto.event.NewEventDto;
-import ru.yandex.practicum.ewm.dto.event.UpdateEventUserRequest;
+import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateRequest;
 import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateResult;
 import ru.yandex.practicum.ewm.dto.participationRequest.ParticipationRequestDto;
@@ -55,7 +55,7 @@ public class PrivateEventController {
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto getUsersEvent(@PathVariable long userId,
                                       @PathVariable long eventId,
-                                      @RequestBody @Valid UpdateEventUserRequest request) {
+                                      @RequestBody @Valid UpdateEventRequestDto request) {
         return eventService.updateEventByUser(eventId, userId, request);
     }
 

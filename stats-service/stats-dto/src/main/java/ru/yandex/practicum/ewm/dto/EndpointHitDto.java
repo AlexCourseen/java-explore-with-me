@@ -10,7 +10,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class EndpointHitDto {
@@ -25,4 +24,11 @@ public class EndpointHitDto {
     @NotBlank(message = "timestamp не может быть пустым")
     private String timestamp;
 
+    @Builder
+    public EndpointHitDto(String app, String uri, String ip, String timestamp) {
+        this.app = app;
+        this.uri = uri;
+        this.ip = ip;
+        this.timestamp = timestamp;
+    }
 }

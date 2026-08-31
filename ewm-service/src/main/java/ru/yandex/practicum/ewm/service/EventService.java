@@ -3,8 +3,7 @@ package ru.yandex.practicum.ewm.service;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.dto.event.NewEventDto;
-import ru.yandex.practicum.ewm.dto.event.UpdateEventAdminRequest;
-import ru.yandex.practicum.ewm.dto.event.UpdateEventUserRequest;
+import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.yandex.practicum.ewm.model.State;
 
 import java.time.LocalDateTime;
@@ -34,9 +33,9 @@ public interface EventService {
                                               String rangeStart,
                                               String rangeEnd);
 
-    EventFullDto updateEventByAdmin(long eventId, UpdateEventAdminRequest request);
+    EventFullDto updateEventByAdmin(long eventId, UpdateEventRequestDto request);
 
-    EventFullDto updateEventByUser(long eventId, long userId, UpdateEventUserRequest request);
+    EventFullDto updateEventByUser(long eventId, long userId, UpdateEventRequestDto request);
 
     Collection<EventShortDto> getUsersEvents(int from, int size, long userId);
 
