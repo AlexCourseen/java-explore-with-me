@@ -5,18 +5,19 @@
 
     <parent>
         <groupId>ru.practicum</groupId>
-        <artifactId>stats-service</artifactId>
+        <artifactId>explore-with-me</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>stats-server</artifactId>
-    <name>Stats Service Server</name>
+    <artifactId>ewm-service</artifactId>
+
+    <name>Main Service</name>
 
     <dependencies>
         <dependency>
             <groupId>ru.practicum</groupId>
-            <artifactId>stats-dto</artifactId>
+            <artifactId>stats-client</artifactId>
         </dependency>
 
         <dependency>
@@ -68,5 +69,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

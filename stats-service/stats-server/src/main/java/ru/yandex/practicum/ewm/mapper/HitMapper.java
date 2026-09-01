@@ -10,7 +10,9 @@ import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HitMapper {
-    public static Hit mapToHit(EndpointHitDto request, DateTimeFormatter formatter) {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public static Hit mapToHit(EndpointHitDto request) {
         Hit hit = new Hit();
         hit.setIp(request.getIp());
         hit.setUri(request.getUri());

@@ -8,6 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.yandex.practicum.ewm.dto.EndpointHitDto;
+import ru.yandex.practicum.ewm.dto.ViewStatsDto;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,17 +30,21 @@ public class StatsClient extends BaseClient {
         return post("/hit", request);
     }
 
-    public ResponseEntity<Object> getStats(String start, String end, List<String> uris, boolean unique) {
+    public List<ViewStatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
         String path = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("start", start);
         parameters.put("end", end);
         if (uris != null && !uris.isEmpty()) {
-            parameters.put("uris", uris);
+            parameters.put("uris", String.join(",", uris));
+        } else {
+            parameters.put("uris", "");
         }
         parameters.put("unique", unique);
 
-        return get(path, parameters);
+        ViewStatsDto[] response = rest.getForObject(path, ViewStatsDto[].class, parameters);
+
+        return response != null ? List.of(response) : List.of();
     }
 }

@@ -1,0 +1,43 @@
+package ru.yandex.practicum.ewm.service;
+
+import ru.yandex.practicum.ewm.dto.event.EventFullDto;
+import ru.yandex.practicum.ewm.dto.event.EventShortDto;
+import ru.yandex.practicum.ewm.dto.event.NewEventDto;
+import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
+import ru.yandex.practicum.ewm.model.State;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
+public interface EventService {
+    EventFullDto createEvent(long userId, NewEventDto dto);
+
+    EventFullDto getEvent(long eventId);
+
+    Collection<EventShortDto> getPublishedEvents(int from,
+                                                 int size,
+                                                 String sortBy,
+                                                 String text,
+                                                 List<Long> catIds,
+                                                 Boolean paid,
+                                                 LocalDateTime rangeStart,
+                                                 LocalDateTime rangeEnd,
+                                                 Boolean onlyAvailable);
+
+    Collection<EventFullDto> getEventsByAdmin(int from,
+                                              int size,
+                                              List<State> states,
+                                              List<Long> users,
+                                              List<Long> categories,
+                                              String rangeStart,
+                                              String rangeEnd);
+
+    EventFullDto updateEventByAdmin(long eventId, UpdateEventRequestDto request);
+
+    EventFullDto updateEventByUser(long eventId, long userId, UpdateEventRequestDto request);
+
+    Collection<EventShortDto> getUsersEvents(int from, int size, long userId);
+
+    EventFullDto getUsersEvent(long userId, long eventId);
+}
