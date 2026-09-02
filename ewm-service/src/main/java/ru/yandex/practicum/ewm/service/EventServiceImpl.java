@@ -53,6 +53,7 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient;
 
 
+
     @Override
     public EventFullDto getEvent(long eventId) {
         Event event = checkEvent(eventId);
