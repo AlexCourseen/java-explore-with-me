@@ -49,8 +49,7 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.getEventComments(eventId).stream()
                 .filter(e -> e.getAuthor().equals(author))
                 .findFirst()
-                .ifPresent(e ->
-                {
+                .ifPresent(comment -> {
                     throw new ConflictedDataException("Нельзя повторно создать комментарий");
                 });
         Comment comment = new Comment();
