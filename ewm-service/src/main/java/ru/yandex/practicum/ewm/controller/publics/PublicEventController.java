@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.ewm.client.StatsClient;
 import ru.yandex.practicum.ewm.dto.EndpointHitDto;
+import ru.yandex.practicum.ewm.dto.comment.CommentDto;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
+import ru.yandex.practicum.ewm.service.CommentService;
 import ru.yandex.practicum.ewm.service.EventService;
 
 import java.time.LocalDateTime;
@@ -26,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PublicEventController {
     private final EventService eventService;
+    private final CommentService commentService;
     private final StatsClient statsClient;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -66,5 +69,16 @@ public class PublicEventController {
                 .build();
         statsClient.createHit(hitStats);
         return eventService.getEvent(eventId);
+    }
+
+    @GetMapping("/{eventId}/comments")
+    public Collection<CommentDto> getComments(@PathVariable long eventId) {
+        return commentService.getComments(eventId);
+    }
+
+    @GetMapping("/{eventId}/comments/{commId}")
+    public CommentDto getComment(@PathVariable long eventId,
+                                 @PathVariable long commId) {
+        return commentService.getComment(eventId,commId);
     }
 }

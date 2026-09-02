@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.ewm.dto.comment.CommentDto;
+import ru.yandex.practicum.ewm.dto.comment.NewCommentDto;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.dto.event.NewEventDto;
@@ -20,6 +23,7 @@ import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateRequest;
 import ru.yandex.practicum.ewm.dto.participationRequest.EventRequestStatusUpdateResult;
 import ru.yandex.practicum.ewm.dto.participationRequest.ParticipationRequestDto;
+import ru.yandex.practicum.ewm.service.CommentService;
 import ru.yandex.practicum.ewm.service.EventService;
 import ru.yandex.practicum.ewm.service.ParticipationRequestService;
 
@@ -31,6 +35,7 @@ import java.util.Collection;
 public class PrivateEventController {
     private final EventService eventService;
     private final ParticipationRequestService requestService;
+    private final CommentService commentService;
 
     @PostMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
@@ -88,5 +93,29 @@ public class PrivateEventController {
                                                                 @PathVariable long eventId,
                                                                 @RequestBody @Valid EventRequestStatusUpdateRequest request) {
         return requestService.updateInboundRequests(userId, eventId, request);
+    }
+
+    @PostMapping("/{userId}/events/{eventId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addComment(@PathVariable long userId,
+                                 @PathVariable long eventId,
+                                 @RequestBody @Valid NewCommentDto request) {
+        return commentService.addComment(userId, eventId, request);
+    }
+
+    @PatchMapping("/{userId}/events/{eventId}/comments/{commId}")
+    public CommentDto updateComment(@PathVariable long userId,
+                                    @PathVariable long eventId,
+                                    @PathVariable long commId,
+                                    @RequestBody @Valid NewCommentDto request) {
+        return commentService.updateComment(userId, eventId, commId, request);
+    }
+
+    @DeleteMapping("/{userId}/events/{eventId}/comments/{commId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delComment(@PathVariable long userId,
+                           @PathVariable long eventId,
+                           @PathVariable long commId) {
+        commentService.delCommentByAuthor(userId, eventId, commId);
     }
 }

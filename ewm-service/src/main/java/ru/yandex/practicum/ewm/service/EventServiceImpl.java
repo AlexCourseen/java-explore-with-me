@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.ewm.client.StatsClient;
 import ru.yandex.practicum.ewm.dto.ViewStatsDto;
+import ru.yandex.practicum.ewm.dto.comment.CommentDto;
 import ru.yandex.practicum.ewm.dto.event.EventFullDto;
 import ru.yandex.practicum.ewm.dto.event.EventShortDto;
 import ru.yandex.practicum.ewm.dto.event.NewEventDto;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.ewm.dto.event.UpdateEventRequestDto;
 import ru.yandex.practicum.ewm.exception.ConflictedDataException;
 import ru.yandex.practicum.ewm.exception.NotFoundException;
 import ru.yandex.practicum.ewm.exception.ValidationException;
+import ru.yandex.practicum.ewm.mapper.CommentMapper;
 import ru.yandex.practicum.ewm.mapper.EventMapper;
 import ru.yandex.practicum.ewm.model.Category;
 import ru.yandex.practicum.ewm.model.Event;
@@ -22,6 +24,7 @@ import ru.yandex.practicum.ewm.model.State;
 import ru.yandex.practicum.ewm.model.StateAction;
 import ru.yandex.practicum.ewm.model.User;
 import ru.yandex.practicum.ewm.repository.CategoryRepository;
+import ru.yandex.practicum.ewm.repository.CommentRepository;
 import ru.yandex.practicum.ewm.repository.EventRepository;
 import ru.yandex.practicum.ewm.repository.LocationRepository;
 import ru.yandex.practicum.ewm.repository.UserRepository;
@@ -45,6 +48,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
+    private final CommentRepository commentRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final StatsClient statsClient;
 
@@ -66,7 +70,13 @@ public class EventServiceImpl implements EventService {
             long actualHits = stats.getFirst().getHits();
             event.setViews(actualHits);
         }
-        return EventMapper.mapToEventFullDto(event);
+        EventFullDto eventDto = EventMapper.mapToEventFullDto(event);
+        List<CommentDto> comments = commentRepository.getEventComments(eventId)
+                .stream()
+                .map(CommentMapper::mapToCommentDto)
+                .toList();
+        eventDto.setComments(comments);
+        return eventDto;
     }
 
     @Override
@@ -125,12 +135,23 @@ public class EventServiceImpl implements EventService {
                 throw new IllegalArgumentException("Дата начала не может быть позже даты окончания");
             }
         }
-        return eventRepository.findEventsByAdmin(PageRequest.of(from, size), states, users, categories, startTime,
+
+        Collection<EventFullDto> eventDtos = eventRepository.findEventsByAdmin(PageRequest.of(from, size), states, users, categories, startTime,
                         endTime)
                 .stream()
                 .map(EventMapper::mapToEventFullDto)
                 .collect(Collectors.toList());
 
+        for (EventFullDto event : eventDtos) {
+            if (event.getState().equals(PUBLISHED)) {
+                List<CommentDto> comments = commentRepository.getEventComments(event.getId())
+                        .stream()
+                        .map(CommentMapper::mapToCommentDto)
+                        .toList();
+                event.setComments(comments);
+            }
+        }
+        return eventDtos;
     }
 
     @Override
@@ -175,7 +196,16 @@ public class EventServiceImpl implements EventService {
                 event.setState(CANCELED);
             }
         }
-        return EventMapper.mapToEventFullDto(event);
+        EventFullDto eventDto = EventMapper.mapToEventFullDto(event);
+        if (event.getState().equals(PUBLISHED)) {
+            List<CommentDto> comments = commentRepository.getEventComments(eventId)
+                    .stream()
+                    .map(CommentMapper::mapToCommentDto)
+                    .toList();
+            eventDto.setComments(comments);
+            return eventDto;
+        }
+        return eventDto;
     }
 
     @Override
@@ -212,7 +242,16 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getUsersEvent(long userId, long eventId) {
         checkUser(userId);
         Event event = checkEvent(eventId);
-        return EventMapper.mapToEventFullDto(event);
+        EventFullDto eventDto = EventMapper.mapToEventFullDto(event);
+        if (event.getState().equals(PUBLISHED)) {
+            List<CommentDto> comments = commentRepository.getEventComments(eventId)
+                    .stream()
+                    .map(CommentMapper::mapToCommentDto)
+                    .toList();
+            eventDto.setComments(comments);
+            return eventDto;
+        }
+        return eventDto;
     }
 
     private void updateEventFields(Event event, UpdateEventRequestDto request) {

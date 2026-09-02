@@ -5,11 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import ru.yandex.practicum.ewm.dto.category.CategoryDto;
+import ru.yandex.practicum.ewm.dto.comment.CommentDto;
 import ru.yandex.practicum.ewm.dto.location.LocationDto;
 import ru.yandex.practicum.ewm.dto.user.UserShortDto;
 import ru.yandex.practicum.ewm.model.State;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,4 +37,5 @@ public class EventFullDto {
     private State state;
     private String title;
     private long views;
+    private List<CommentDto> comments = new ArrayList<>();
 }
