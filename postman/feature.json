@@ -1,0 +1,807 @@
+{
+	"info": {
+		"_postman_id": "1a6a64c7-1efa-43d1-87b4-22003c47b65f",
+		"name": "feature_comments",
+		"description": "Коллекция запросов для тестирования функционала комментариев.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25488267",
+		"_collection_link": "https://planetary-meteor-947866.postman.co/workspace/Team-Workspace~0157bfb6-7cee-488b-8e4d-1b4059c44a7b/collection/25488267-1a6a64c7-1efa-43d1-87b4-22003c47b65f?action=share&source=collection_link&creator=25488267"
+	},
+	"item": [
+		{
+			"name": "Private",
+			"item": [
+				{
+					"name": "Добавить комментарий (Успех)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// 1. Генерация случайного email для предотвращения конфликтов уникальности",
+									"const randomId = Math.floor(Math.random() * 10000);",
+									"const uniqueEmail = `user_${randomId}.petrov@practicummail.ru`;",
+									"",
+									"// 2. Создание пользователя (Admin)",
+									"pm.sendRequest({",
+									"    url: 'http://localhost:8080/admin/users',",
+									"    method: 'POST',",
+									"    header: { 'Content-Type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            \"email\": uniqueEmail,",
+									"            \"name\": \"Jphnв3323ввв Петров\"",
+									"        })",
+									"    }",
+									"}, function (err, res) {",
+									"    if (err) { console.error('Ошибка создания пользователя:', err); return; }",
+									"    ",
+									"    const user = res.json();",
+									"    const userId = user.id;",
+									"    pm.environment.set(\"userId\", userId);",
+									"    console.log(`Пользователь создан с ID: ${userId}`);",
+									"",
+									"    // 3. Создание категории (Admin)",
+									"    pm.sendRequest({",
+									"        url: 'http://localhost:8080/admin/categories',",
+									"        method: 'POST',",
+									"        header: { 'Content-Type': 'application/json' },",
+									"        body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify({",
+									"                \"name\": \"Чай\" + randomId",
+									"            })",
+									"        }",
+									"    }, function (err, res) {",
+									"        if (err) { console.error('Ошибка создания категории:', err); return; }",
+									"        ",
+									"        const category = res.json();",
+									"        const categoryId = category.id;",
+									"        console.log(`Категория создана с ID: ${categoryId}`);",
+									"",
+									"        // 4. Создание события пользователем (Private)",
+									"        pm.sendRequest({",
+									"            url: `http://localhost:8080/users/${userId}/events`,",
+									"            method: 'POST',",
+									"            header: { 'Content-Type': 'application/json' },",
+									"            body: {",
+									"                mode: 'raw',",
+									"                raw: JSON.stringify({",
+									"                    \"annotation\": \"С323232323232плав на байдарках похож на полет.\",",
+									"                    \"category\": categoryId, // Подставляем ID созданной категории",
+									"                    \"description\": \"Сплав на байдарках похож на полет. На спокойной воде — это парение. На бурной, порожистой — выполнение фигур высшего пилотажа. И то, и другое дарят чувство обновления, феерические эмоции, яркие впечатления.\",",
+									"                    \"eventDate\": \"2027-12-31 15:10:05\",",
+									"                    \"location\": {",
+									"                        \"lat\": 56.754167,",
+									"                        \"lon\": 40.62",
+									"                    },",
+									"                    \"paid\": true,",
+									"                    \"participantLimit\": 10,",
+									"                    \"requestModeration\": false,",
+									"                    \"title\": \"Сплав на байдарках\"",
+									"                })",
+									"            }",
+									"        }, function (err, res) {",
+									"            if (err) { console.error('Ошибка создания события:', err); return; }",
+									"            ",
+									"            const event = res.json();",
+									"            const eventId = event.id;",
+									"            pm.environment.set(\"eventId\", eventId);",
+									"            console.log(`Событие создано с ID: ${eventId}`);",
+									"",
+									"            // 5. Публикация события администратором (Admin)",
+									"            pm.sendRequest({",
+									"                url: `http://localhost:8080/admin/events/${eventId}`, // Подставляем ID созданного события",
+									"                method: 'PATCH',",
+									"                header: { 'Content-Type': 'application/json' },",
+									"                body: {",
+									"                    mode: 'raw',",
+									"                    raw: JSON.stringify({",
+									"                        \"stateAction\": \"PUBLISH_EVENT\"",
+									"                    })",
+									"                }",
+									"            }, function (err, res) {",
+									"                if (err) { console.error('Ошибка публикации события:', err); return; }",
+									"                console.log(`Событие ${eventId} успешно опубликовано.`);",
+									"            });",
+									"        });",
+									"    });",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test(\"check id\", function () {",
+									"    pm.expect(responseData).to.have.property('id');",
+									"});",
+									"",
+									"pm.test(\"check text\", function () {",
+									"    pm.expect(responseData).to.have.property('text');",
+									"    pm.expect(responseData.text).to.eql(\"Комментарий\");",
+									"});",
+									"",
+									"pm.test(\"check eventId\", function () {",
+									"    pm.expect(responseData).to.have.property('eventId');",
+									"});",
+									"pm.test(\"check created\", function () {",
+									"    pm.expect(responseData).to.have.property('created');",
+									"});   ",
+									"pm.test(\"check author\", function () {",
+									"    pm.expect(responseData).to.have.property('author');",
+									"    pm.expect(responseData.author).to.have.property('id');",
+									"    pm.expect(responseData.author).to.have.property('name');",
+									"});",
+									"",
+									"pm.environment.set(\"commId\", responseData.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Комментарий\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/comments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"events",
+								"{{eventId}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавить комментарий (Ошибка: Пустой текст)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"   \"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/comments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"events",
+								"{{eventId}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Обновить свой комментарий",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test(\"check id\", function () {",
+									"    pm.expect(responseData.id).to.eql(pm.environment.get(\"commId\"));",
+									"});",
+									"",
+									"pm.test(\"check text\", function () {",
+									"    pm.expect(responseData.text).to.eql(\"Новый текст комментария\");",
+									"});",
+									"",
+									"pm.test(\"check eventId\", function () {",
+									"    pm.expect(responseData.eventId).to.eql(pm.environment.get(\"eventId\"));    ",
+									"});",
+									"",
+									"pm.test(\"check created\", function () {",
+									"    pm.expect(responseData).to.have.property('created');",
+									"});   ",
+									"pm.test(\"check author\", function () {",
+									"    pm.expect(responseData).to.have.property('author');",
+									"    pm.expect(responseData.author).to.have.property('id');",
+									"    pm.expect(responseData.author).to.have.property('name');",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Новый текст комментария\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/comments/{{commId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удалить свой комментарий",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/comments/{{commId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "Получить все комментарии события",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test(\"check id\", function () {",
+									"    pm.expect(responseData[0]).to.have.property('id');",
+									"});",
+									"",
+									"pm.test(\"check text\", function () {",
+									"    pm.expect(responseData[0]).to.have.property('text');",
+									"});",
+									"",
+									"pm.test(\"check eventId\", function () {",
+									"    pm.expect(responseData[0]).to.have.property('eventId');",
+									"});",
+									"pm.test(\"check created\", function () {",
+									"    pm.expect(responseData[0]).to.have.property('created');",
+									"});   ",
+									"pm.test(\"check author\", function () {",
+									"    pm.expect(responseData[0]).to.have.property('author');",
+									"    pm.expect(responseData[0].author).to.have.property('id');",
+									"    pm.expect(responseData[0].author).to.have.property('name');",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Получаем ID первого пользователя и ID события из текущего окружения Postman",
+									"const firstUserId = pm.environment.get(\"userId\");",
+									"const eventId = pm.environment.get(\"eventId\");",
+									"",
+									"if (!firstUserId || !eventId) {",
+									"    console.error(\"Ошибка: В окружении отсутствуют переменные userId и/или eventId!\");",
+									"}",
+									"",
+									"// 1. Создание ПЕРВОГО комментария от имени существующего userId",
+									"pm.sendRequest({",
+									"    url: `http://localhost:8080/users/${firstUserId}/events/${eventId}/comments`,",
+									"    method: 'POST',",
+									"    header: { 'Content-Type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            \"text\": \"Первый тестовый комментарий\"",
+									"        })",
+									"    }",
+									"}, function (err, res) {",
+									"    if (err) { console.error('Ошибка создания 1-го комментария:', err); return; }",
+									"    ",
+									"    const comment1 = res.json();",
+									"    pm.environment.set(\"firstCommentId\", comment1.id);",
+									"    console.log(`Первый комментарий создан с ID: ${comment1.id}`);",
+									"",
+									"    // Генерация уникального email для ВТОРОГО пользователя",
+									"    const randomId = Math.floor(Math.random() * 10000);",
+									"    const uniqueEmail2 = `user_second_${randomId}.petrov@practicummail.ru`;",
+									"",
+									"    // 2. Создание ВТОРОГО пользователя (так как один юзер не может оставлять 2 комментария к ивенту)",
+									"    pm.sendRequest({",
+									"        url: 'http://localhost:8080/admin/users',",
+									"        method: 'POST',",
+									"        header: { 'Content-Type': 'application/json' },",
+									"        body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify({",
+									"                \"email\": uniqueEmail2,",
+									"                \"name\": \"Иван Второй Комментатор\"",
+									"            })",
+									"        }",
+									"    }, function (err, res) {",
+									"        if (err) { console.error('Ошибка создания 2-го пользователя:', err); return; }",
+									"        ",
+									"        const secondUser = res.json();",
+									"        const secondUserId = secondUser.id;",
+									"        pm.environment.set(\"secondUserId\", secondUserId);",
+									"        console.log(`Второй пользователь создан с ID: ${secondUserId}`);",
+									"",
+									"        // 3. Создание ВТОРОГО комментария от имени нового пользователя",
+									"        pm.sendRequest({",
+									"            url: `http://localhost:8080/users/${secondUserId}/events/${eventId}/comments`,",
+									"            method: 'POST',",
+									"            header: { 'Content-Type': 'application/json' },",
+									"            body: {",
+									"                mode: 'raw',",
+									"                raw: JSON.stringify({",
+									"                    \"text\": \"Второй тестовый комментарий\"",
+									"                })",
+									"            }",
+									"        }, function (err, res) {",
+									"            if (err) { console.error('Ошибка создания 2-го комментария:', err); return; }",
+									"            ",
+									"            const comment2 = res.json();",
+									"            pm.environment.set(\"commId\", comment2.id);",
+									"            console.log(`Второй комментарий создан с ID: ${comment2.id}`);",
+									"        });",
+									"    });",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/{{eventId}}/comments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить конкретный комментарий события",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test(\"check id\", function () {",
+									"    pm.expect(responseData.id).to.eql(pm.environment.get(\"commId\"));",
+									"});",
+									"",
+									"pm.test(\"check text\", function () {",
+									"    pm.expect(responseData).to.have.property('text');",
+									"});",
+									"",
+									"pm.test(\"check eventId\", function () {",
+									"    pm.expect(responseData.eventId).to.eql(pm.environment.get(\"eventId\"));    ",
+									"});",
+									"pm.test(\"check created\", function () {",
+									"    pm.expect(responseData).to.have.property('created');",
+									"});   ",
+									"pm.test(\"check author\", function () {",
+									"    pm.expect(responseData).to.have.property('author');",
+									"    pm.expect(responseData.author).to.have.property('id');",
+									"    pm.expect(responseData.author).to.have.property('name');",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить событие",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test(\"check comments\", function () {",
+									"    pm.expect(responseData).to.have.property('comments');",
+									"});",
+									"",
+									"pm.test(\"check comment id\", function () {",
+									"    pm.expect(responseData.comments[0]).to.have.property('id');",
+									"});",
+									"",
+									"pm.test(\"check text\", function () {",
+									"    pm.expect(responseData.comments[0]).to.have.property('text');",
+									"});",
+									"",
+									"pm.test(\"check eventId\", function () {",
+									"    pm.expect(responseData.comments[0].eventId).to.eql(responseData.id);    ",
+									"});",
+									"pm.test(\"check created\", function () {",
+									"    pm.expect(responseData.comments[0]).to.have.property('created');",
+									"});   ",
+									"pm.test(\"check author\", function () {",
+									"    pm.expect(responseData.comments[0]).to.have.property('author');",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/{{eventId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"{{eventId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Удалить комментарий администратором",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// 1. Генерация случайного email для предотвращения конфликтов уникальности",
+									"const randomId = Math.floor(Math.random() * 10000);",
+									"const uniqueEmail = `user_${randomId}.petrov@practicummail.ru`;",
+									"",
+									"// 2. Создание пользователя (Admin)",
+									"pm.sendRequest({",
+									"    url: 'http://localhost:8080/admin/users',",
+									"    method: 'POST',",
+									"    header: { 'Content-Type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            \"email\": uniqueEmail,",
+									"            \"name\": \"Jphnв3323ввв Петров\"",
+									"        })",
+									"    }",
+									"}, function (err, res) {",
+									"    if (err) { console.error('Ошибка создания пользователя:', err); return; }",
+									"    ",
+									"    const user = res.json();",
+									"    const userId = user.id;",
+									"    pm.environment.set(\"userId\", userId);",
+									"    console.log(`Пользователь создан с ID: ${userId}`);",
+									"",
+									"    // 3. Создание категории (Admin)",
+									"    pm.sendRequest({",
+									"        url: 'http://localhost:8080/admin/categories',",
+									"        method: 'POST',",
+									"        header: { 'Content-Type': 'application/json' },",
+									"        body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify({",
+									"                \"name\": \"Чай$\" + randomId",
+									"            })",
+									"        }",
+									"    }, function (err, res) {",
+									"        if (err) { console.error('Ошибка создания категории:', err); return; }",
+									"        ",
+									"        const category = res.json();",
+									"        const categoryId = category.id;",
+									"        console.log(`Категория создана с ID: ${categoryId}`);",
+									"",
+									"        // 4. Создание события пользователем (Private)",
+									"        pm.sendRequest({",
+									"            url: `http://localhost:8080/users/${userId}/events`,",
+									"            method: 'POST',",
+									"            header: { 'Content-Type': 'application/json' },",
+									"            body: {",
+									"                mode: 'raw',",
+									"                raw: JSON.stringify({",
+									"                    \"annotation\": \"С323232323232плав на байдарках похож на полет.\",",
+									"                    \"category\": categoryId,",
+									"                    \"description\": \"Сплав на байдарках похож на полет. На спокойной воде — это парение. На бурной, порожистой — выполнение фигур высшего пилотажа. И то, и другое дарят чувство обновления, феерические эмоции, яркие впечатления.\",",
+									"                    \"eventDate\": \"2027-12-31 15:10:05\",",
+									"                    \"location\": {",
+									"                        \"lat\": 56.754167,",
+									"                        \"lon\": 40.62",
+									"                    },",
+									"                    \"paid\": true,",
+									"                    \"participantLimit\": 10,",
+									"                    \"requestModeration\": false,",
+									"                    \"title\": \"Сплав на байдарках\"",
+									"                })",
+									"            }",
+									"        }, function (err, res) {",
+									"            if (err) { console.error('Ошибка создания события:', err); return; }",
+									"            ",
+									"            const event = res.json();",
+									"            const eventId = event.id;",
+									"            pm.environment.set(\"eventId\", eventId);",
+									"            console.log(`Событие создано с ID: ${eventId}`);",
+									"",
+									"            // 5. Публикация события администратором (Admin)",
+									"            pm.sendRequest({",
+									"                url: `http://localhost:8080/admin/events/${eventId}`,",
+									"                method: 'PATCH',",
+									"                header: { 'Content-Type': 'application/json' },",
+									"                body: {",
+									"                    mode: 'raw',",
+									"                    raw: JSON.stringify({",
+									"                        \"stateAction\": \"PUBLISH_EVENT\"",
+									"                    })",
+									"                }",
+									"            }, function (err, res) {",
+									"                if (err) { console.error('Ошибка публикации события:', err); return; }",
+									"                console.log(`Событие ${eventId} успешно опубликовано.`);",
+									"",
+									"                // 6. Добавление комментария (Private) с подстановкой созданных userId и eventId",
+									"                pm.sendRequest({",
+									"                    url: `http://localhost:8080/users/${userId}/events/${eventId}/comments`,",
+									"                    method: 'POST',",
+									"                    header: { 'Content-Type': 'application/json' },",
+									"                    body: {",
+									"                        mode: 'raw',",
+									"                        raw: JSON.stringify({",
+									"                            \"text\": \"Комментарий\"",
+									"                        })",
+									"                    }",
+									"                }, function (err, res) {",
+									"                    if (err) { console.error('Ошибка добавления комментария:', err); return; }",
+									"                    ",
+									"                    const comment = res.json();",
+									"                    pm.environment.set(\"commId\", comment.id);",
+									"                    console.log(`Комментарий успешно добавлен. ID комментария: ${comment.id}`);",
+									"                });",
+									"            });",
+									"        });",
+									"    });",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/events/{{eventId}}/comments/{{commId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить события",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test(\"check comments\", function () {",
+									"    pm.expect(responseData[0]).to.have.property('comments');",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/events",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"events"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "eventId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "commId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
