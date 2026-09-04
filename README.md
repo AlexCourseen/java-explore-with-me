@@ -1,2 +1,3 @@
 # java-explore-with-me
-Template repository for ExploreWithMe project.
+Пул-реквест
+https://github.com/AlexCourseen/java-explore-with-me/pull/26 
